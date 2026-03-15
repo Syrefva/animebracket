@@ -9,3 +9,6 @@ define('DB_NAME', 'anime_bracket');
 // Whether to enable the global exception handler. Generally
 // enable for production
 define('HANDLE_EXCEPTIONS', true);
+
+// Dev login: enable to use /user/dev-login (logs in as devadmin, no Reddit). Remove for production.
+define('DEV_LOGIN', true);

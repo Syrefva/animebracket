@@ -14,6 +14,25 @@ namespace Controller {
             $code = Lib\Url::Get('code', null);
             $action = array_shift($params);
 
+            // Dev login: bypass Reddit OAuth when DEV_LOGIN is defined (e.g. in config)
+            if ($action === 'dev-login' && defined('DEV_LOGIN') && DEV_LOGIN) {
+                $user = Api\User::getByName('devadmin');
+                if (!$user) {
+                    $user = new Api\User();
+                    $user->name = 'devadmin';
+                    $user->admin = true;
+                    $user->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+                    $user->age = 1; // > 0 required
+                    $user->sync();
+                }
+                if ($user && $user->id) {
+                    $user->csrfToken = bin2hex(openssl_random_pseudo_bytes(Api\User::USER_CSRF_ENTROPY));
+                    Lib\Session::set('user', $user);
+                    header('Location: /me/');
+                    exit;
+                }
+            }
+
             if ($action === 'logout') {
                 $user = Api\User::getCurrentUser();
                 if ($user) {

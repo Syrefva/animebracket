@@ -38,6 +38,15 @@ namespace Api {
       }
     }
 
+    public static function getById($id) {
+      $retVal = null;
+      $result = Lib\Db::Query('SELECT * FROM users WHERE user_id = :id', [ ':id' => $id ]);
+      if ($result && $result->count) {
+        $retVal = new User(Lib\Db::Fetch($result));
+      }
+      return $retVal;
+    }
+
     public static function getByName($userName) {
       $retVal = null;
       $result = Lib\Db::Query('SELECT * FROM users WHERE user_name LIKE :userName', [ ':userName' => $userName ]);
