@@ -3,6 +3,9 @@
 ###
 FROM debian:bullseye
 
+# 1. Add this line to grab the Composer binary
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
 # Install server things
 RUN apt update && \
     apt install -y php7.4 \
@@ -14,6 +17,7 @@ RUN apt update && \
                    php7.4-mysql \
                    php7.4-zip \
                    php7.4-cli \
+                   unzip \
                    nginx \
                    memcached \
                    redis \

@@ -1,6 +1,7 @@
 <?php
 
-define('CORE_LOCATION', '/var/www/brakkit');
+// Use directory of this config file (works in Docker, traditional deploy, any path)
+define('CORE_LOCATION', __DIR__);
 define('BRACKET_SOURCE', 1);
 
 define('DEFAULT_CONTROLLER', 'landing');
@@ -30,7 +31,7 @@ define('JS_VERSION', '20131109');
 define('SESSION_DOMAIN', '.brakk.it');
 
 // Path to the /view directory (must be a full path, no trailing slash)
-define('VIEW_PATH', '/var/www/brakkit/views');
+define('VIEW_PATH', CORE_LOCATION . '/views');
 
 // ID of a bracket to be featured on the landing page
 define('LANDING_FEATURE_BRACKET', 1);

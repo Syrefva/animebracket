@@ -1,10 +1,9 @@
 <?php
 
-// Database credentials
-define('DB_DISABLE', true); // Remove this for production
-define('DB_HOST', 'localhost');
-define('DB_USER', 'username');
-define('DB_PASS', 'password');
+// Database credentials (omit DB_DISABLE to enable DB; define it to disable)
+define('DB_HOST', $_SERVER['DB_HOST'] ?? 'localhost'); // Set by nginx in Docker; 'db' = Compose service
+define('DB_USER', 'animebracket');
+define('DB_PASS', 'thisisatestpassword');
 define('DB_NAME', 'anime_bracket');
 
 // Whether to enable the global exception handler. Generally
