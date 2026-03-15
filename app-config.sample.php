@@ -17,7 +17,7 @@ define('REDDIT_SECRET', 'reddit_secret');
 define('REDDIT_HANDLER', 'http://reddit_oauth_handler');
 define('REDDIT_MINAGE', 2592000);
 
-define('IMAGE_LOCATION', '/path/to/images');
+define('IMAGE_LOCATION', CORE_LOCATION . '/images');
 define('IMAGE_URL', 'http://localhost:8080/images');
 
 define('REDIS_SERVER', 'tcp://127.0.0.1:6379');
