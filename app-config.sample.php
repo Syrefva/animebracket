@@ -28,7 +28,8 @@ define('USE_MIN', false);
 define('CSS_VERSION', '20140816');
 define('JS_VERSION', '20131109');
 
-define('SESSION_DOMAIN', '.brakk.it');
+// Empty domain = current host (needed for localhost); use .brakk.it for production
+define('SESSION_DOMAIN', (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ? '' : '.brakk.it');
 
 // Path to the /view directory (must be a full path, no trailing slash)
 define('VIEW_PATH', CORE_LOCATION . '/views');
