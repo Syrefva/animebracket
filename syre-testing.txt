@@ -1,0 +1,10 @@
+some quick steps for myself for testing
+
+1. go to http://localhost:8080/user/dev-login to login as dev user
+2. make a bracket called `test4`. make sure to not leave rules empty
+3. start noms
+4. run `podman exec -i animebracket-db-1 mysql -u animebracket -pthisisatestpassword anime_bracket < sql/insert-test4-nominees.sql`
+
+
+tips:
+- add `?flushCache` to flush the cache...
