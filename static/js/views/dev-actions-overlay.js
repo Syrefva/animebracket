@@ -16,4 +16,22 @@ export function init() {
       window.location.href = url.toString();
     });
   }
+
+  const createSeededBtn = result.overlay.querySelector('[data-dev-action="create-seeded-bracket"]');
+  if (createSeededBtn) {
+    createSeededBtn.addEventListener('click', () => {
+      if (createSeededBtn.disabled) return;
+      fetch('/user/dev-create-seeded-bracket/', { method: 'POST' })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            alert(data.message || 'Failed to create seeded bracket.');
+          }
+        })
+        .catch(() => alert('Failed to create seeded bracket.'));
+    });
+  }
+
 }

@@ -1,10 +1,8 @@
 some quick steps for myself for testing
 
 1. use the Dev overlay (bottom-right corner) to create or log in as a user
-2. make a bracket called `test4`. make sure to not leave rules empty
-3. start noms
-4. run `podman exec -i animebracket-db-1 mysql -u animebracket -pthisisatestpassword anime_bracket < sql/insert-test4-nominees.sql`
-
+2. use Dev Actions (top-right) -> Create seeded test bracket
+3. start noms (or continue with the seeded bracket)
 
 tips:
 - add `?flushCache` to flush the cache...
