@@ -10,5 +10,5 @@ define('DB_NAME', 'anime_bracket');
 // enable for production
 define('HANDLE_EXCEPTIONS', true);
 
-// Dev login: enable to use /user/dev-login (logs in as devadmin, no Reddit). Remove for production.
+// Dev login: enable the bottom-right overlay to create/switch dev users (no Reddit). Remove for production.
 define('DEV_LOGIN', true);

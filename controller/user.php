@@ -14,21 +14,59 @@ namespace Controller {
             $code = Lib\Url::Get('code', null);
             $action = array_shift($params);
 
-            // Dev login: bypass Reddit OAuth when DEV_LOGIN is defined (e.g. in config)
-            if ($action === 'dev-login' && defined('DEV_LOGIN') && DEV_LOGIN) {
-                $user = Api\User::getByName('devadmin');
-                if (!$user) {
-                    $user = new Api\User();
-                    $user->name = 'devadmin';
-                    $user->admin = true;
-                    $user->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-                    $user->age = 1; // > 0 required
-                    $user->sync();
-                }
-                if ($user && $user->id) {
+            // Dev routes (DEV_LOGIN only)
+            if (defined('DEV_LOGIN') && DEV_LOGIN) {
+                if ($action === 'dev-login') {
+                    $username = isset($params[0]) ? trim($params[0]) : '';
+                    if (!$username) {
+                        header('Location: /');
+                        exit;
+                    }
+                    if (!preg_match('/^(devadmin|devuser)_[a-f0-9]+$/i', $username)) {
+                        header('Location: /?error=dev_forbidden');
+                        exit;
+                    }
+                    $user = Api\User::getByName($username);
+                    if (!$user) {
+                        header('Location: /?error=dev_forbidden');
+                        exit;
+                    }
+                    $cookieIds = self::_getDevUsersCreatedCookie();
+                    if (!in_array($user->id, $cookieIds)) {
+                        header('Location: /?error=dev_forbidden');
+                        exit;
+                    }
                     $user->csrfToken = bin2hex(openssl_random_pseudo_bytes(Api\User::USER_CSRF_ENTROPY));
                     Lib\Session::set('user', $user);
-                    header('Location: /me/');
+                    $redirect = Lib\Url::Get('redirect', '/me/');
+                    header('Location: ' . $redirect);
+                    exit;
+                }
+                if ($action === 'dev-create') {
+                    $type = isset($params[0]) ? strtolower(trim($params[0])) : '';
+                    if ($type !== 'admin' && $type !== 'user') {
+                        header('Location: /');
+                        exit;
+                    }
+                    $user = Api\User::createDevUser($type === 'admin');
+                    if (!$user) {
+                        header('Location: /?error=dev_create_failed');
+                        exit;
+                    }
+                    self::_appendDevUsersCreatedCookie($user->id);
+                    $user->csrfToken = bin2hex(openssl_random_pseudo_bytes(Api\User::USER_CSRF_ENTROPY));
+                    Lib\Session::set('user', $user);
+                    $redirect = Lib\Url::Get('redirect', '/me/');
+                    header('Location: ' . $redirect);
+                    exit;
+                }
+                if ($action === 'dev-logout') {
+                    $currentUser = Api\User::getCurrentUser();
+                    if ($currentUser) {
+                        $currentUser->logout();
+                    }
+                    $redirect = Lib\Url::Get('redirect', '/brackets/');
+                    header('Location: ' . $redirect);
                     exit;
                 }
             }
@@ -57,6 +95,21 @@ namespace Controller {
                 Lib\Display::renderAndAddKey('content', 'login', $obj);
             }
 
+        }
+
+        private static function _getDevUsersCreatedCookie() {
+            return \Api\User::getDevUsersCreatedCookieIds();
+        }
+
+        private static function _appendDevUsersCreatedCookie($userId) {
+            $ids = self::_getDevUsersCreatedCookie();
+            if (!in_array($userId, $ids)) {
+                $ids[] = $userId;
+            }
+            $value = implode(',', $ids);
+            $expires = time() + (86400 * 365); // 1 year
+            $domain = defined('SESSION_DOMAIN') ? SESSION_DOMAIN : '';
+            setcookie('dev_users_created', $value, $expires, '/', $domain, false, true);
         }
 
         private static function _loginPage() {
