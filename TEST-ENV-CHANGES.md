@@ -56,6 +56,7 @@ When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 
 - Toggle button ("Dev Actions") expands/collapses the panel
 - **Flush cache**: Reloads the current page with `?flushCache` appended to bypass cache for that request
+- **Create seeded test bracket**: Creates a new bracket with 32 nominees + characters and placeholder images (requires login). Use Dev Actions -> Create seeded test bracket.
 
 ### Shared overlay infrastructure
 
@@ -80,10 +81,6 @@ When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 **sql/init-nobody-character.sql** *(new)*
 - Creates system bracket (id 1) and "Nobody" character (id 1)
 - Used for bye/wildcard placeholders
-
-**sql/insert-test4-nominees.sql** *(new)*
-- Inserts 32 nominees + characters into a `test4` bracket
-- For manual end-to-end testing
 
 ---
 

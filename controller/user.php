@@ -13,7 +13,7 @@ namespace Controller {
 
             $code = Lib\Url::Get('code', null);
             $action = array_shift($params);
-            $devActions = ['dev-login', 'dev-create', 'dev-logout'];
+            $devActions = ['dev-login', 'dev-create', 'dev-logout', 'dev-create-seeded-bracket'];
 
             if (in_array($action, $devActions, true) && (!defined('DEV_LOGIN') || !DEV_LOGIN)) {
                 http_response_code(404);
@@ -74,6 +74,74 @@ namespace Controller {
                     $redirect = Lib\Url::Get('redirect', '/brackets/');
                     header('Location: ' . $redirect);
                     exit;
+                }
+                if ($action === 'dev-create-seeded-bracket') {
+                    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'POST required' ]);
+                    }
+                    $user = Api\User::getCurrentUser();
+                    if (!$user) {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'Login required' ]);
+                    }
+                    $bracket = new Api\Bracket();
+                    $bracket->name = 'Test ' . bin2hex(random_bytes(3));
+                    $bracket->rules = 'test';
+                    $bracket->state = 0;
+                    $bracket->start = time();
+                    $bracket->advanceHour = -1;
+                    $bracket->minAge = 2592000;
+                    $bracket->captcha = Api\Bracket::$CAPTCHA_STATUS['NEVER'];
+                    $bracket->nameLabel = 'Character name';
+                    $bracket->sourceLabel = 'Source';
+                    $bracket->hidden = 0;
+                    $bracket->generatePerma();
+                    if (!$bracket->sync()) {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'Failed to create bracket' ]);
+                    }
+                    if (!$bracket->addUser($user)) {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'Failed to add user as owner' ]);
+                    }
+                    $bracketId = $bracket->id;
+                    $created = time();
+                    $placeholderUrl = 'https://placeholder.local/1.jpg';
+                    $nomineeValues = [];
+                    $charValues = [];
+                    $nomineeParams = [ ':bracketId' => $bracketId, ':created' => $created, ':placeholderUrl' => $placeholderUrl ];
+                    $charParams = [ ':bracketId' => $bracketId ];
+                    for ($i = 1; $i <= 32; $i++) {
+                        $name = "Nominee $i";
+                        $nomineeValues[] = "(:bracketId, :name$i, NULL, :created, 1, :placeholderUrl)";
+                        $charValues[] = "(:bracketId, :name$i, '', NULL, NULL)";
+                        $nomineeParams[":name$i"] = $name;
+                        $charParams[":name$i"] = $name;
+                    }
+                    $nomineeSql = 'INSERT INTO nominee (bracket_id, nominee_name, nominee_source, nominee_created, nominee_processed, nominee_image) VALUES ' . implode(', ', $nomineeValues);
+                    if (!Lib\Db::Query($nomineeSql, $nomineeParams)) {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'Failed to seed nominees' ]);
+                    }
+                    $charSql = 'INSERT INTO `character` (bracket_id, character_name, character_source, character_seed, character_meta) VALUES ' . implode(', ', $charValues);
+                    if (!Lib\Db::Query($charSql, $charParams)) {
+                        Lib\Display::renderJson((object)[ 'success' => false, 'message' => 'Failed to seed characters' ]);
+                    }
+                    $result = Lib\Db::Query('SELECT character_id FROM `character` WHERE bracket_id = :bracketId ORDER BY character_id ASC', [ ':bracketId' => $bracketId ]);
+                    if ($result && $result->count) {
+                        $idx = 1;
+                        while ($row = Lib\Db::Fetch($result)) {
+                            $charId = (int) $row->character_id;
+                            $path = IMAGE_LOCATION . '/' . base_convert($charId, 10, 36) . '.jpg';
+                            $img = @imagecreatetruecolor(150, 150);
+                            if ($img) {
+                                $grey = imagecolorallocate($img, 128, 128, 128);
+                                imagefill($img, 0, 0, $grey);
+                                $white = imagecolorallocate($img, 255, 255, 255);
+                                imagestring($img, 5, 60, 65, (string) $idx, $white);
+                                @imagejpeg($img, $path);
+                                imagedestroy($img);
+                            }
+                            $idx++;
+                        }
+                    }
+                    Lib\Display::renderJson((object)[ 'success' => true, 'redirect' => '/me/?created&flushCache' ]);
                 }
             }
 

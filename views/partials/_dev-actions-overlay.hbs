@@ -3,6 +3,14 @@
     <button type="button" class="dev-actions-overlay__toggle" data-dev-overlay-toggle aria-label="Dev actions" aria-expanded="false">Dev Actions</button>
     <div class="dev-actions-overlay__panel" data-dev-overlay-panel hidden>
         <button type="button" data-dev-action="flush-cache" class="dev-actions-overlay__action">Flush cache</button>
+        {{#if user}}
+        <button type="button" data-dev-action="create-seeded-bracket" class="dev-actions-overlay__action">Create seeded test bracket</button>
+        {{else}}
+        <div class="dev-actions-overlay__action-wrap">
+            <button type="button" data-dev-action="create-seeded-bracket" class="dev-actions-overlay__action" disabled>Create seeded test bracket</button>
+            <div class="dev-actions-overlay__action-overlay" data-tooltip="Log in to create a seeded bracket" aria-label="Log in to create a seeded bracket"></div>
+        </div>
+        {{/if}}
     </div>
 </div>
 {{/if}}

@@ -137,7 +137,7 @@ Both overlays use `data-dev-overlay-toggle` and `data-dev-overlay-panel` for the
 | Action     | File                                                                                                                |
 | ---------- | ------------------------------------------------------------------------------------------------------------------- |
 | **New**    | `static/scss/dev-overlay.scss` – mixins (panel, toggle, action-link)                                                |
-| **New**    | `static/js/views/dev-overlay.js` – `initToggle()` (in views/ so not ignored by static/js/*.js)                     |
+| **New**    | `static/js/views/dev-overlay.js` – `initToggle()` (in views/ so not ignored by static/js/*.js)                      |
 | **New**    | `views/partials/_dev-actions-overlay.hbs`                                                                           |
 | **New**    | `static/scss/dev-actions-overlay.scss`                                                                              |
 | **New**    | `static/js/views/dev-actions-overlay.js`                                                                            |
@@ -160,4 +160,3 @@ window.location.href = url.toString();
 ```
 
 Preserves hash if present. If URL already has `flushCache`, navigation still triggers a refresh.
-
