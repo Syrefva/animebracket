@@ -1,15 +1,17 @@
 ---
-name: Admin Voting Lock
-overview: Add an admin-toggleable "voting locked" flag (cache-based, separate key) that blocks new votes. Admins can lock/unlock whenever. No DB migration. Admin lock is cleared automatically on advance (not on rollback).
+name: Bracket Owner Voting Lock
+overview: Add a bracket-owner-toggleable "voting locked" flag (cache-based, separate key) that blocks new votes. Bracket owners can lock/unlock whenever. No DB migration. Lock is cleared automatically on advance (not on rollback).
 todos: []
 isProject: false
 ---
 
-# Admin Voting Lock
+# Bracket Owner Voting Lock
 
 ## Feasibility: **Easy** (roughly 1-2 hours)
 
-The codebase already has a similar pattern for blocking votes during round advancement (`isLocked()` in [api/bracket.php](api/bracket.php)). Both elimination votes and bracket votes use the same `_vote()` endpoint in [controller/submit.php](controller/submit.php). Adding an admin-controlled voting lock is straightforward.
+The codebase already has a similar pattern for blocking votes during round advancement (`isLocked()` in [api/bracket.php](api/bracket.php)). Both elimination votes and bracket votes use the same `_vote()` endpoint in [controller/submit.php](controller/submit.php). Adding a bracket-owner-controlled voting lock is straightforward.
+
+**Access control:** The lock toggle is available to **bracket owners** (users who own the bracket), not just site admins. Access is enforced via `_getBracket()` in [controller/me.php](controller/me.php), which only returns brackets from `getUserOwnedBrackets()`. The UI shows the lock toggle to all bracket owners when the bracket is in eliminations or voting — no `isSiteAdmin` check.
 
 ---
 
@@ -23,17 +25,17 @@ flowchart LR
     _vote --> Bracket[Api\Bracket]
     _vote --> Votes[Insert votes]
     
-    Admin[Admin] --> Process[controller/admin/process.php]
+    Owner[Bracket Owner] --> Process[controller/admin/process.php]
     Process --> _displayCharacters[Edit entrants]
-    Admin --> Counts[controller/admin/counts.php]
+    Owner --> Counts[controller/admin/counts.php]
     Counts --> eliminationCounts[Current Vote Counts]
 ```
 
 
 
 - **Elimination voting**: Same as bracket voting — [controller/submit.php](controller/submit.php) `_vote()` handles both when `state` is `BS_ELIMINATIONS` or `BS_VOTING`
-- **Existing lock**: `isLocked()` / `Api:Bracket:bracket_locked_{id}` — blocks votes during round advancement (temporary, not admin-controlled). We add a **separate** admin lock; do not reuse this key.
-- **Admin processing during eliminations**: Edit Entrants at `/me/process/{perma}/characters/`, Current Vote Counts at `/me/counts/{perma}/`
+- **Existing lock**: `isLocked()` / `Api:Bracket:bracket_locked_{id}` — blocks votes during round advancement (temporary, not owner-controlled). We add a **separate** owner-controlled lock; do not reuse this key.
+- **Bracket owner processing during eliminations**: Edit Entrants at `/me/process/{perma}/characters/`, Current Vote Counts at `/me/counts/{perma}/`
 - **Vote page**: `/{perma}/vote` — shows elimination ballot when `state` is `BS_ELIMINATIONS`
 
 ---
@@ -46,10 +48,10 @@ Use a **separate** cache key `Api:Bracket:voting_locked_{id}` — do **not** reu
 
 ```php
 /**
- * Generator for the admin voting locked cache key.
+ * Generator for the bracket-owner voting locked cache key.
  * Uses a separate key from _lockedCacheKey (bracket_locked) so that the procedural
- * lock during advance/rollback and the admin-controlled lock don't conflict —
- * advance can run without waiting for admin to unlock, and _vote() checks both.
+ * lock during advance/rollback and the owner-controlled lock don't conflict —
+ * advance can run without waiting for owner to unlock, and _vote() checks both.
  */
 private function _votingLockedCacheKey() {
     return 'Api:Bracket:voting_locked_' . $this->id;
@@ -65,12 +67,12 @@ public function setVotingLocked(bool $locked) {
 }
 ```
 
-Use `CACHE_VERY_LONG` (24 hours) so the lock doesn't expire during admin processing.
+Use `CACHE_VERY_LONG` (24 hours) so the lock doesn't expire during bracket owner processing.
 Return the cache write result so endpoint handlers can fail gracefully if lock state is not persisted.
 
-### 2. Clear Admin Lock on Advancement ([api/bracket.php](api/bracket.php))
+### 2. Clear Lock on Advancement ([api/bracket.php](api/bracket.php))
 
-In `advance()` only (not `rollback()`), after `_unlock()`, call `$this->setVotingLocked(false)` so the admin lock is cleared when a new round starts. Do **not** clear on rollback — the admin may want the lock to persist when reverting to a previous round.
+In `advance()` only (not `rollback()`), after `_unlock()`, call `$this->setVotingLocked(false)` so the lock is cleared when a new round starts. Do **not** clear on rollback — the bracket owner may want the lock to persist when reverting to a previous round.
 
 ### 3. Block Votes in Submit Controller ([controller/submit.php](controller/submit.php))
 
@@ -83,19 +85,20 @@ if ($bracket->isVotingLocked()) {
 }
 ```
 
-### 4. Admin Toggle Endpoint
+### 4. Bracket Owner Toggle Endpoint
 
 Add a new action in [controller/admin/process.php](controller/admin/process.php) — or a dedicated controller if preferred:
 
 - Route: `POST /me/process/{perma}/lock-voting/` (or extend existing process routes)
 - Body: `action=lock` or `action=unlock`
+- **Access:** Bracket owners only (enforced by `_getBracket()`, which checks `getUserOwnedBrackets()` — no site-admin requirement)
 - Logic: Verify CSRF (`_auth`) server-side, then call `$bracket->setVotingLocked($locked)`, verify `isVotingLocked() === $locked`, and return JSON `{ success, locked }`
-- **No state restriction** — admins can lock/unlock whenever (eliminations, voting, etc.)
+- **No state restriction** — bracket owners can lock/unlock whenever (eliminations, voting, etc.)
 - Wire via the existing `Process::generate()` switch (e.g. new case `'lock-voting'`)
 
-`**_lockVoting` function:** Toggles the admin voting lock for a bracket. When locked, users cannot submit votes. Accepts `action=lock` or `action=unlock` via POST, requires valid CSRF token, and returns JSON `{ success, locked }` only when write + verification succeed; otherwise return `{ success: false, message }`.
+`_lockVoting` function: Toggles the voting lock for a bracket. When locked, users cannot submit votes. Accepts `action=lock` or `action=unlock` via POST, requires valid CSRF token, and returns JSON `{ success, locked }` only when write + verification succeed; otherwise return `{ success: false, message }`.
 
-### 5. Admin UI — Bracket actions panel ([views/admin/brackets.hbs](views/admin/brackets.hbs), [static/js/views/admin.js](static/js/views/admin.js))
+### 5. Bracket Owner UI — Actions panel ([views/admin/brackets.hbs](views/admin/brackets.hbs), [static/js/views/admin.js](static/js/views/admin.js))
 
 In the expandable actions list (the `<ul>` under "Actions"), add a new `<li>` when the bracket is in eliminations or voting:
 
