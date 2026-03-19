@@ -1,7 +1,7 @@
 {{#if DEV_LOGIN}}
 <div id="dev-user-overlay" class="dev-user-overlay"{{#if user}} data-current-user="{{user.name}}"{{/if}}>
-    <button type="button" class="dev-user-overlay__toggle" aria-label="Dev account selector">Dev Account Selector</button>
-    <div class="dev-user-overlay__panel" hidden>
+    <button type="button" class="dev-user-overlay__toggle" data-dev-overlay-toggle aria-label="Dev account selector" aria-expanded="false">Dev Account Selector</button>
+    <div class="dev-user-overlay__panel" data-dev-overlay-panel hidden>
         {{#if user}}
         <div class="dev-user-overlay__current">
             Logged in as {{user.name}} ({{#if user.admin}}admin{{else}}user{{/if}})

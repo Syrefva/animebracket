@@ -6,6 +6,7 @@ import Characters from './views/characters';
 import Landing from './views/landing';
 import Nav from './views/nav';
 import { init as initDevUserOverlay } from './views/dev-user-overlay';
+import { init as initDevActionsOverlay } from './views/dev-actions-overlay';
 import Nominations from './views/nominations';
 import Admin from './views/admin';
 
@@ -47,6 +48,7 @@ if (document.cookie.indexOf('utcOffset') === -1) {
 
 Nav.init();
 initDevUserOverlay();
+initDevActionsOverlay();
 
 // Strip the trailing slash from the path so that the router doesn't break
 const path = window.location.pathname.replace(/\/$/, '');

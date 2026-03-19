@@ -1,0 +1,47 @@
+@import "globals";
+
+@mixin dev-overlay-panel($placement: 'above') {
+  position: absolute;
+  @if $placement == 'above' {
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 8px;
+  } @else {
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+  }
+  min-width: 220px;
+  padding: 12px;
+  background: $darkGrey;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  &[hidden] {
+    display: none;
+  }
+}
+
+@mixin dev-overlay-toggle($color: #a94442) {
+  @include small-button();
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: $color !important;
+  &:hover {
+    background-color: darken($color, 8%) !important;
+  }
+}
+
+@mixin dev-overlay-action-link() {
+  color: $lightBlue;
+  font-size: 14px;
+  font-family: inherit;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  &:hover {
+    text-decoration: underline;
+  }
+}

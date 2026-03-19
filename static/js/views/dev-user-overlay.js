@@ -2,37 +2,23 @@
  * Dev User Overlay - toggle, fetch dev users, populate switch/login list.
  * No-ops when #dev-user-overlay is absent (DEV_LOGIN disabled).
  */
+import { initToggle } from '../dev-overlay';
+
 export function init() {
-  const overlay = document.getElementById('dev-user-overlay');
-  if (!overlay) return;
-
-  const toggle = overlay.querySelector('.dev-user-overlay__toggle');
-  const panel = overlay.querySelector('.dev-user-overlay__panel');
-  const listEl = overlay.querySelector('[data-dev-user-list]');
   const redirectTarget = getCurrentRedirectTarget();
-
-  if (!toggle || !panel || !listEl) return;
-
-  // Keep redirect target aligned to the full current URL.
-  overlay.querySelectorAll('a[href*="redirect="]').forEach((link) => {
-    link.href = link.href.replace(/redirect=[^&]*/, `redirect=${redirectTarget}`);
-  });
-
-  toggle.addEventListener('click', () => {
-    const isHidden = panel.hasAttribute('hidden');
-    if (isHidden) {
-      panel.removeAttribute('hidden');
-      fetchAndPopulateList(listEl, overlay.dataset.currentUser || '', redirectTarget);
-    } else {
-      panel.setAttribute('hidden', '');
+  const result = initToggle('dev-user-overlay', {
+    onOpen: () => {
+      const listEl = result.overlay.querySelector('[data-dev-user-list]');
+      if (listEl) {
+        fetchAndPopulateList(listEl, result.overlay.dataset.currentUser || '', redirectTarget);
+      }
     }
   });
+  if (!result) return;
 
-  // Click outside to close
-  document.addEventListener('click', (evt) => {
-    if (panel.hasAttribute('hidden')) return;
-    if (overlay.contains(evt.target)) return;
-    panel.setAttribute('hidden', '');
+  // Keep redirect target aligned to the full current URL.
+  result.overlay.querySelectorAll('a[href*="redirect="]').forEach((link) => {
+    link.href = link.href.replace(/redirect=[^&]*/, `redirect=${redirectTarget}`);
   });
 }
 
