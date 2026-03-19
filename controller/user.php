@@ -13,6 +13,12 @@ namespace Controller {
 
             $code = Lib\Url::Get('code', null);
             $action = array_shift($params);
+            $devActions = ['dev-login', 'dev-create', 'dev-logout'];
+
+            if (in_array($action, $devActions, true) && (!defined('DEV_LOGIN') || !DEV_LOGIN)) {
+                http_response_code(404);
+                exit;
+            }
 
             // Dev routes (DEV_LOGIN only)
             if (defined('DEV_LOGIN') && DEV_LOGIN) {
@@ -109,7 +115,19 @@ namespace Controller {
             $value = implode(',', $ids);
             $expires = time() + (86400 * 365); // 1 year
             $domain = defined('SESSION_DOMAIN') ? SESSION_DOMAIN : '';
-            setcookie('dev_users_created', $value, $expires, '/', $domain, false, true);
+            if (PHP_VERSION_ID >= 70300) {
+                setcookie('dev_users_created', $value, [
+                    'expires' => $expires,
+                    'path' => '/',
+                    'domain' => $domain,
+                    'secure' => false,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+            } else {
+                // Backward-compatible SameSite support for older PHP versions.
+                setcookie('dev_users_created', $value, $expires, '/; samesite=Lax', $domain, false, true);
+            }
         }
 
         private static function _loginPage() {

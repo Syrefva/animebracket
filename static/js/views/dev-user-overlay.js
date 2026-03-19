@@ -9,14 +9,20 @@ export function init() {
   const toggle = overlay.querySelector('.dev-user-overlay__toggle');
   const panel = overlay.querySelector('.dev-user-overlay__panel');
   const listEl = overlay.querySelector('[data-dev-user-list]');
+  const redirectTarget = getCurrentRedirectTarget();
 
   if (!toggle || !panel || !listEl) return;
+
+  // Keep redirect target aligned to the full current URL.
+  overlay.querySelectorAll('a[href*="redirect="]').forEach((link) => {
+    link.href = link.href.replace(/redirect=[^&]*/, `redirect=${redirectTarget}`);
+  });
 
   toggle.addEventListener('click', () => {
     const isHidden = panel.hasAttribute('hidden');
     if (isHidden) {
       panel.removeAttribute('hidden');
-      fetchAndPopulateList(listEl, overlay.dataset.currentUser || '');
+      fetchAndPopulateList(listEl, overlay.dataset.currentUser || '', redirectTarget);
     } else {
       panel.setAttribute('hidden', '');
     }
@@ -30,7 +36,7 @@ export function init() {
   });
 }
 
-function fetchAndPopulateList(listEl, currentUsername) {
+function fetchAndPopulateList(listEl, currentUsername, redirectTarget) {
   listEl.innerHTML = '';
 
   fetch('/api/dev-users/')
@@ -39,16 +45,21 @@ function fetchAndPopulateList(listEl, currentUsername) {
       return res.json();
     })
     .then((users) => {
-      const redirect = encodeURIComponent(window.location.pathname || '/');
+      if (!Array.isArray(users)) return;
       users.forEach((u) => {
         if (u.name === currentUsername) return;
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `/user/dev-login/${encodeURIComponent(u.name)}?redirect=${redirect}`;
+        a.href = `/user/dev-login/${encodeURIComponent(u.name)}?redirect=${redirectTarget}`;
         a.textContent = u.name;
         li.appendChild(a);
         listEl.appendChild(li);
       });
     })
     .catch(() => {});
+}
+
+function getCurrentRedirectTarget() {
+  const fullPath = `${window.location.pathname || '/'}${window.location.search || ''}${window.location.hash || ''}`;
+  return encodeURIComponent(fullPath || '/');
 }
