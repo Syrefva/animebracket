@@ -2,7 +2,7 @@
  * Dev User Overlay - toggle, fetch dev users, populate switch/login list.
  * No-ops when #dev-user-overlay is absent (DEV_LOGIN disabled).
  */
-import { initToggle } from '../dev-overlay';
+import { initToggle } from './dev-overlay';
 
 export function init() {
   const redirectTarget = getCurrentRedirectTarget();

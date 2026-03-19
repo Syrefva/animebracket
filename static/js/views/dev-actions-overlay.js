@@ -2,7 +2,7 @@
  * Dev Actions Overlay - toggle + action handlers.
  * No-ops when #dev-actions-overlay is absent (DEV_LOGIN disabled).
  */
-import { initToggle } from '../dev-overlay';
+import { initToggle } from './dev-overlay';
 
 export function init() {
   const result = initToggle('dev-actions-overlay');
