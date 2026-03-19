@@ -1,0 +1,23 @@
+{{#if DEV_LOGIN}}
+<div id="dev-user-overlay" class="dev-user-overlay"{{#if user}} data-current-user="{{user.name}}"{{/if}}>
+    <button type="button" class="dev-user-overlay__toggle" aria-label="Dev account selector">Dev Account Selector</button>
+    <div class="dev-user-overlay__panel" hidden>
+        {{#if user}}
+        <div class="dev-user-overlay__current">
+            Logged in as {{user.name}} ({{#if user.admin}}admin{{else}}user{{/if}})
+        </div>
+        {{/if}}
+        <div class="dev-user-overlay__create">
+            <a href="/user/dev-create/admin?redirect={{route}}" class="dev-user-overlay__btn">Create new admin user</a>
+            <a href="/user/dev-create/user?redirect={{route}}" class="dev-user-overlay__btn">Create new normal user</a>
+        </div>
+        <div class="dev-user-overlay__switch">
+            <div class="dev-user-overlay__label">{{#if user}}Switch user:{{else}}Login as:{{/if}}</div>
+            <ul class="dev-user-overlay__user-list" data-dev-user-list></ul>
+        </div>
+        {{#if user}}
+        <a href="/user/dev-logout/?redirect={{route}}" class="dev-user-overlay__logout">Log out</a>
+        {{/if}}
+    </div>
+</div>
+{{/if}}

@@ -33,6 +33,14 @@ namespace Controller {
                 case 'characters':
                     $retVal = self::_getBracketCharacters($params);
                     break;
+                case 'dev-users':
+                    if (!defined('DEV_LOGIN') || !DEV_LOGIN) {
+                        http_response_code(404);
+                        $retVal = [];
+                        break;
+                    }
+                    $retVal = \Api\User::getDevUsers(\Api\User::getDevUsersCreatedCookieIds());
+                    break;
             }
 
             // CORS support

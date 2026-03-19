@@ -38,25 +38,33 @@ All changes in `test-env` compared to `main`. The branch adds local development 
 **config.sample.php**
 - DB host reads from `$_SERVER['DB_HOST']` (set by nginx in Docker)
 - Ships with local test credentials
-- Adds `DEV_LOGIN` flag (enables `/user/dev-login`)
+- Adds `DEV_LOGIN` flag (enables bottom-right Dev overlay)
 
 ---
 
-## 3. Dev Login (Bypass Reddit OAuth)
+## 3. Dev Login Overlay (Bypass Reddit OAuth)
 
-**controller/user.php**
-- New `/user/dev-login` route
-- When `DEV_LOGIN` is true, creates or fetches `devadmin` user, sets session, redirects to `/me/`
+When `DEV_LOGIN` is true, a floating overlay appears in the bottom-right corner on all pages.
 
-**api/user.php**
-- New `getById($id)` static method
+**Overlay UI**
+- Toggle button ("Dev") expands/collapses the panel
+- **Logged in**: Shows current user, switch-user list (from API), and log out link
+- **Logged out**: Create admin / Create normal user buttons, and login-as list
+
+**Routes**
+- `/user/dev-create/{admin|user}` – creates `devadmin_*` or `devuser_*` with random suffix, sets session and cookie, redirects
+- `/user/dev-login/{username}` – verifies user ID is in `dev_users_created` cookie, sets session, redirects
+- `/user/dev-logout/?redirect=` – clears session, redirects
+
+**API**
+- `GET /api/dev-users/` – returns dev users whose IDs are in the `dev_users_created` cookie (cookie-based isolation for multiple testers)
+
+**Cookie**
+- `dev_users_created`: comma-separated user IDs; appended when you create a user; each tester only sees their own users
 
 ---
 
 ## 4. Database / Test Data
-
-**sql/dev-user.sql** *(new)*
-- Inserts `devadmin` admin user for local testing
 
 **sql/init-nobody-character.sql** *(new)*
 - Creates system bracket (id 1) and "Nobody" character (id 1)

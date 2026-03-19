@@ -25,6 +25,7 @@ namespace Controller {
             $user = Api\User::getCurrentUser();
             Lib\Display::addKey('user', $user);
             Lib\Display::addKey('route', urlencode(Lib\Url::Get('q', '/')));
+            Lib\Display::addKey('DEV_LOGIN', defined('DEV_LOGIN') && DEV_LOGIN);
 
             // If we have a user, seed the test bucket so that
             // random distribution is deterministic

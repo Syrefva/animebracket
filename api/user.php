@@ -56,6 +56,79 @@ namespace Api {
       return $retVal;
     }
 
+    /**
+     * Parses dev_users_created cookie and returns array of user IDs.
+     */
+    public static function getDevUsersCreatedCookieIds() {
+      $raw = isset($_COOKIE['dev_users_created']) ? $_COOKIE['dev_users_created'] : '';
+      if (!$raw) {
+        return [];
+      }
+      $ids = [];
+      foreach (explode(',', $raw) as $part) {
+        $id = (int) trim($part);
+        if ($id > 0) {
+          $ids[] = $id;
+        }
+      }
+      return array_values(array_unique($ids));
+    }
+
+    /**
+     * Returns dev users whose IDs are in the given array (from dev_users_created cookie).
+     * Only returns users matching devadmin_* or devuser_* pattern.
+     */
+    public static function getDevUsers(array $cookieIds) {
+      $retVal = [];
+      if (empty($cookieIds)) {
+        return $retVal;
+      }
+      $ids = array_values(array_filter(array_map('intval', $cookieIds)));
+      if (empty($ids)) {
+        return $retVal;
+      }
+      $placeholders = implode(',', array_fill(0, count($ids), '?'));
+      $result = Lib\Db::Query(
+        'SELECT * FROM users WHERE user_id IN (' . $placeholders . ') AND (user_name LIKE \'devadmin_%\' OR user_name LIKE \'devuser_%\')',
+        $ids
+      );
+      if ($result && $result->count) {
+        while ($row = Lib\Db::Fetch($result)) {
+          $retVal[] = (object) [
+            'id' => (int) $row->user_id,
+            'name' => $row->user_name,
+            'admin' => ((int) $row->user_admin) === 1
+          ];
+        }
+      }
+      return $retVal;
+    }
+
+    /**
+     * Creates a dev user with random suffix. Returns the user or null on failure.
+     */
+    public static function createDevUser($admin) {
+      $prefix = $admin ? 'devadmin' : 'devuser';
+      $maxAttempts = 5;
+      for ($i = 0; $i < $maxAttempts; $i++) {
+        $suffix = bin2hex(random_bytes(2));
+        $name = $prefix . '_' . $suffix;
+        $existing = self::getByName($name);
+        if ($existing) {
+          continue;
+        }
+        $user = new User();
+        $user->name = $name;
+        $user->admin = $admin ? 1 : 0;
+        $user->ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        $user->age = 1;
+        if ($user->sync()) {
+          return $user;
+        }
+      }
+      return null;
+    }
+
     public static function getCurrentUser() {
       $user = Lib\Session::get('user');
 
