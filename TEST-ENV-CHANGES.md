@@ -67,6 +67,7 @@ When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 - `/user/dev-create/{admin|user}` – creates `devadmin_*` or `devuser_*` with random suffix, sets session and cookie, redirects
 - `/user/dev-login/{username}` – verifies user ID is in `dev_users_created` cookie, sets session, redirects
 - `/user/dev-logout/?redirect=` – clears session, redirects
+- `/user/dev-create-seeded-bracket/` (POST) – creates a bracket with 32 nominees + 32 characters and placeholder images, assigns to current user, returns JSON with redirect
 
 **API**
 - `GET /api/dev-users/` – returns dev users whose IDs are in the `dev_users_created` cookie (cookie-based isolation for multiple testers)
@@ -81,6 +82,8 @@ When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 **sql/init-nobody-character.sql** *(new)*
 - Creates system bracket (id 1) and "Nobody" character (id 1)
 - Used for bye/wildcard placeholders
+
+**Test brackets with nominees/characters**: Use Dev Actions → Create seeded test bracket (no manual SQL)
 
 ---
 
