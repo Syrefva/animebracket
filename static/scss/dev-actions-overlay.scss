@@ -1,0 +1,35 @@
+@import "globals";
+
+.dev-actions-overlay {
+  position: fixed;
+  top: 98px; /* 82px nav + 16px padding (matches account selector bottom offset) */
+  right: 16px;
+  z-index: $BASE-INDEX + 100;
+
+  &__toggle {
+    @include dev-overlay-toggle(#a94442);
+  }
+
+  &__panel {
+    @include dev-overlay-panel('below');
+  }
+
+  &__action {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: $standard;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      background: $dark;
+    }
+  }
+}
