@@ -38,20 +38,31 @@ All changes in `test-env` compared to `main`. The branch adds local development 
 **config.sample.php**
 - DB host reads from `$_SERVER['DB_HOST']` (set by nginx in Docker)
 - Ships with local test credentials
-- Adds `DEV_LOGIN` flag (enables bottom-right Dev overlay)
+- Adds `DEV_LOGIN` flag (enables Dev Account Selector and Dev Actions overlays)
 
 ---
 
-## 3. Dev Login Overlay (Bypass Reddit OAuth)
+## 3. Dev Overlays (Bypass Reddit OAuth)
 
-When `DEV_LOGIN` is true, a floating overlay appears in the bottom-right corner on all pages.
+When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 
-**Overlay UI**
-- Toggle button ("Dev") expands/collapses the panel
+### Dev Account Selector (bottom-right)
+
+- Toggle button ("Dev Account Selector") expands/collapses the panel
 - **Logged in**: Shows current user, switch-user list (from API), and log out link
 - **Logged out**: Create admin / Create normal user buttons, and login-as list
 
-**Routes**
+### Dev Actions (top-right)
+
+- Toggle button ("Dev Actions") expands/collapses the panel
+- **Flush cache**: Reloads the current page with `?flushCache` appended to bypass cache for that request
+
+### Shared overlay infrastructure
+
+- `static/js/views/dev-overlay.js` – shared toggle + click-outside logic
+- `static/scss/dev-overlay.scss` – shared mixins (panel, toggle, action-link)
+
+### Routes
 - `/user/dev-create/{admin|user}` – creates `devadmin_*` or `devuser_*` with random suffix, sets session and cookie, redirects
 - `/user/dev-login/{username}` – verifies user ID is in `dev_users_created` cookie, sets session, redirects
 - `/user/dev-logout/?redirect=` – clears session, redirects
@@ -80,3 +91,5 @@ When `DEV_LOGIN` is true, a floating overlay appears in the bottom-right corner 
 
 **syre-testing.txt** *(new)*
 - Quick-start steps: dev login, creating a test bracket, seeding nominees, cache tips
+
+**Cache bypass**: Use the Dev Actions overlay (top-right) → "Flush cache" button, or manually append `?flushCache` to the URL
