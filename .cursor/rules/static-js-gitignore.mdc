@@ -1,0 +1,13 @@
+---
+description: Place new JS files in static/js subdirs (not root) due to .gitignore
+globs: static/js/**/*.js
+alwaysApply: false
+---
+
+# static/js File Placement
+
+`.gitignore` has `static/js/*.js`, which ignores any `.js` file directly in `static/js/`.
+
+**When adding new JS modules**, place them in a subdirectory (e.g. `static/js/views/`, `static/js/lib/`) so they are tracked by git. Do not add new files directly to `static/js/`.
+
+Existing files like `app.js` in the root are tracked because they were committed before the rule; new files there would be ignored.
