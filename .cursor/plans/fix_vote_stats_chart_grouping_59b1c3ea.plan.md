@@ -16,8 +16,9 @@ Stats proc is per `(tier, group)`; `getBracketRounds` sometimes merges a whole t
 - `getVotingStats`: `getRoundCountsByGroup` for matchup counts; combine tier when `max(counts) <= COMBINE_GROUP_THRESHOLD` **or** `sum(counts) <= COMBINE_TIER_MAX_TOTAL_MATCHUPS`; rollup SQL with `COUNT(DISTINCT user_id)`; merged rows `group: null`. Chart row order: `ksort` tiers then groups, append in that order (no extra sort).
 - `_votingStatsChartLabel`: eliminations + Quarter/Semi/Title from matchup totals; else `Round {tier}` + group if split.
 - `stats.js`: `item.label || 'Unknown'`.
+- `controller/admin/stats.php`: render when stats is `[]` (empty data) and only skip on `null`.
 
-**Files:** [api/round.php](api/round.php), [static/js/views/admin/stats.js](static/js/views/admin/stats.js)
+**Files:** [api/round.php](api/round.php), [static/js/views/admin/stats.js](static/js/views/admin/stats.js), [controller/admin/stats.php](controller/admin/stats.php)
 
 **Cache:** `Api:Round:getVotingStates_{bracketId}` after changes.
 
