@@ -1,5 +1,7 @@
 # test-env Branch Changes (Relative to main)
 
+> **Last updated:** branch `test-env`, commit `738efa6526e43b25cc332d55aa8c8d3214f5c52d`. After editing this file, set this to the new tip (`git rev-parse HEAD` on the branch that carries the doc).
+
 All changes in `test-env` compared to `main`. The branch adds local development tooling, Docker improvements, and testing workflows.
 
 ---
