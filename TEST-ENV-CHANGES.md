@@ -40,6 +40,9 @@ All changes in `test-env` compared to `main`. The branch adds local development 
 - Ships with local test credentials
 - Adds `DEV_LOGIN` flag (enables Dev Account Selector and Dev Actions overlays)
 
+**webpack.config.js**
+- `CopyPlugin` copies static assets into `dist/`: `static/images/` → `dist/static/images/`, `static/js/jquery.Jcrop.min.js` → `dist/static/js/` (so nominee cropping in admin works against the built tree), and `static/js/Chart.min.js` → `dist/static/Chart.min.js` (admin vote stats chart)
+
 ---
 
 ## 3. Dev Overlays (Bypass Reddit OAuth)
@@ -91,5 +94,8 @@ When `DEV_LOGIN` is true, two floating overlays appear on all pages.
 
 **syre-testing.txt** *(new)*
 - Quick-start steps: dev login, creating a test bracket, seeding nominees, cache tips
+
+**controller/admin/advance.php**
+- `BRACKET_ADVANCE_DELAY` is `0` (not `300`), so manual “advance bracket” in admin has no cooldown—faster iteration in dev. Use a non-zero value (e.g. `300`) in production if you want that guardrail back.
 
 **Cache bypass**: Use the Dev Actions overlay (top-right) → "Flush cache" button, or manually append `?flushCache` to the URL
