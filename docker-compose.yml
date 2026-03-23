@@ -6,10 +6,12 @@ services:
       context: .
     environment:
       CORE_LOCATION: /app
+      PASSWORD_GATE_ENABLED: ${PASSWORD_GATE_ENABLED:-false}
     ports:
       - '${APP_PORT}:80'
     volumes:
       - ./:/app
+      - ./.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:
       - db
     restart: always
