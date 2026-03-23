@@ -56,3 +56,20 @@ While developing, you can run the static asset builder in watch mode so that the
 ```
 npm start
 ```
+
+### Password Gate (optional)
+
+Use Nginx Basic Auth for test/production. Local development keeps auth off by default.
+
+1. Create `.htpasswd` so the Docker bind mount is always a file:
+   ```
+   cp .htpasswd.example .htpasswd
+   ```
+2. Add credentials:
+   ```
+   htpasswd -c .htpasswd your_username
+   ```
+   Or: `echo "username:$(openssl passwd -apr1)" >> .htpasswd`
+3. Enable the gate by setting `PASSWORD_GATE_ENABLED=true` (for example in `.env`).
+
+When enabled, visitors see a browser username/password prompt before content is served.

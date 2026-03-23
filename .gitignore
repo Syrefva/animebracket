@@ -25,3 +25,4 @@ dist/
 db
 images
 .env
+.htpasswd
