@@ -1,6 +1,6 @@
 # test-env Branch Changes (Relative to main)
 
-> **Last updated:** branch `test-env`, commit `738efa6526e43b25cc332d55aa8c8d3214f5c52d`. After editing this file, set this to the new tip (`git rev-parse HEAD` on the branch that carries the doc).
+> **Last updated:** branch `test-env`, commit `18c2e169b5eaf73c65a3229ba33e8fc4e6d3e1fc`. After editing this file, set this to the new tip (`git rev-parse HEAD` on the branch that carries the doc).
 
 All changes in `test-env` compared to `main`. The branch adds local development tooling, Docker improvements, and testing workflows.
 
@@ -13,19 +13,42 @@ All changes in `test-env` compared to `main`. The branch adds local development 
 
 **docker-compose.yml**
 - Added `CORE_LOCATION` env var for web service
+- Added `PASSWORD_GATE_ENABLED` env var (default `false` via `.env`)
+- Mounts `./.htpasswd` into container at `/etc/nginx/.htpasswd:ro`
 - Switched DB from bind mount to named volume (`dbdata`)
 - Auto-runs init SQL scripts on first DB start
 
 **docker/nginx.conf**
 - Passes `DB_HOST db` to PHP via fastcgi param
+- Each server block includes `/etc/nginx/auth-snippet.conf` (populated at startup based on `PASSWORD_GATE_ENABLED`)
 
 **docker/startup.sh**
 - Adds git safe directory for mounted volume
 - Runs `composer install` when vendor is missing
 - Uses `mkdir -p` for cache directory
+- Toggles auth: when `PASSWORD_GATE_ENABLED=true`, copies `auth-on.conf` to auth-snippet; otherwise writes empty auth-snippet. Validates `.htpasswd` exists and is a file when auth is enabled.
 
 **.gitattributes**
 - Enforces LF line endings on `startup.sh`
+
+---
+
+## 1.5. Password Gate (Optional)
+
+Nginx Basic Auth for test/production. Off by default for local dev.
+
+**Files**
+- `docker/auth-on.conf` – auth directives (`auth_basic`, `auth_basic_user_file`)
+- `.htpasswd.example` – template/instructions (copy to `.htpasswd`)
+- `.htpasswd` – credentials file (gitignored); each line is `username:hash`
+
+**Usage**
+- Create `.htpasswd`: `cp .htpasswd.example .htpasswd` then add credentials via `echo "user:$(openssl passwd -apr1)" > .htpasswd` (or `htpasswd -c .htpasswd user` if available)
+- Enable: set `PASSWORD_GATE_ENABLED=true` in `.env`, then `docker compose up -d` (or `restart web`)
+- Disable: set `PASSWORD_GATE_ENABLED=false` or leave unset
+- Edit users: edit `.htpasswd` directly (delete line to remove user), then `docker compose restart web`
+
+**See README § Password Gate for full steps.**
 
 ---
 
