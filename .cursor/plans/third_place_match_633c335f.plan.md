@@ -39,10 +39,10 @@ isProject: false
 ## Labels and chart copy
 
 - `[getBracketTitleForRound](api/round.php)`:
-  - `roundCount === 2`: `"Finals"` vs `"Semi Finals"` via `**_isDualFinalsLayer**` on `**getRoundsByTier**` rows.
+  - `roundCount === 2`: `"Title and Third Place Matches"` vs `"Semi Finals"` via `**_isDualFinalsLayer**` on `**getRoundsByTier**` rows.
   - `roundCount === 1`: always `"Title Match"`.
 - `[_votingStatsChartLabel](api/round.php)` uses `**count($roundsInTier)**` (4 / 2 / 1) for Quarter / Semi–Finals / Title; `**_isDualFinalsLayer**` for the two-matchup case.
-- `[controller/me.php](controller/me.php)` keeps `nextIsFinal` true for `"Title Match"` and `"Finals"`.
+- `[controller/me.php](controller/me.php)` keeps `nextIsFinal` true for `"Title Match"` and `"Title and Third Place Matches"`.
 
 ## Results and stats behavior
 
@@ -64,7 +64,7 @@ isProject: false
   - single-group bracket,
   - cross-group semifinal bracket (e.g. `test-7903e6` style shape).
 - Advance flow: semis -> title+3rd same tier -> finalize both -> bracket reaches `BS_FINAL`.
-- Labels: `"Semi Finals"` before finals layer, `"Finals"` on dual-finals layer, `"Title Match"` when only one row exists.
+- Labels: `"Semi Finals"` before finals layer, `"Title and Third Place Matches"` on dual-finals layer, `"Title Match"` when only one row exists.
 - Results UI: 3rd-place block when `**THIRD_PLACE_MATCH_ENABLED**` (via `**thirdPlaceMatchEnabled**` on bracket data) **and** Finals/Full (`**group` null/undefined**); hidden on per-group views; TBD row from JS synthetic raw if API has not returned a third row yet; heading **“3rd Place Match”**; compact strip + `**winner--third-place`** styling; absolute vertical placement under title match per `**_positionThirdPlaceBelowTitle`** + gap constant; details in `**bracket-display.js**` + `**bracket-view.scss**` as above.
 - Integrity checks:
   - `[controller/admin/normalize.php](controller/admin/normalize.php)` skips reconcile steps when `**$includesThirdPlaceMatch**` (championship + 3rd adjacent in results); does not duplicate or drop consolation,
