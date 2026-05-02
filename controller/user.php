@@ -110,10 +110,13 @@ namespace Controller {
                     $charParams = [ ':bracketId' => $bracketId ];
                     for ($i = 1; $i <= 32; $i++) {
                         $name = "Nominee $i";
-                        $nomineeValues[] = "(:bracketId, :name$i, NULL, :created, 1, :placeholderUrl)";
-                        $charValues[] = "(:bracketId, :name$i, '', NULL, NULL)";
+                        $source = 'Source ' . (int) ceil($i / 8);
+                        $nomineeValues[] = "(:bracketId, :name$i, :source$i, :created, 1, :placeholderUrl)";
+                        $charValues[] = "(:bracketId, :name$i, :source$i, NULL, NULL)";
                         $nomineeParams[":name$i"] = $name;
+                        $nomineeParams[":source$i"] = $source;
                         $charParams[":name$i"] = $name;
+                        $charParams[":source$i"] = $source;
                     }
                     $nomineeSql = 'INSERT INTO nominee (bracket_id, nominee_name, nominee_source, nominee_created, nominee_processed, nominee_image) VALUES ' . implode(', ', $nomineeValues);
                     if (!Lib\Db::Query($nomineeSql, $nomineeParams)) {
