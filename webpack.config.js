@@ -64,6 +64,7 @@ module.exports = (env, argv) => {
       new CopyPlugin({
         patterns: [
           { from: path.resolve(__dirname, 'static/images/'), to: 'static/images/' },
+          { from: path.resolve(__dirname, 'static/fonts/'), to: 'static/fonts/' },
           { from: path.resolve(__dirname, 'static/js/jquery.Jcrop.min.js'), to: 'static/js/' },
           { from: path.resolve(__dirname, 'static/js/Chart.min.js'), to: 'static/Chart.min.js' },
         ],
