@@ -29,3 +29,6 @@ db
 images
 .env
 .htpasswd
+
+# Local symlink to personal cursor-rules repo
+.cursor/rules/shared
