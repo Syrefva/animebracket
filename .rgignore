@@ -1,0 +1,3 @@
+# Cursor rule discovery respects .gitignore; negate shared rules junction.
+!.cursor/rules/shared
+!.cursor/rules/shared/**
