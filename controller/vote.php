@@ -60,7 +60,7 @@ namespace Controller {
                     Lib\Display::addKey('page', 'vote');
                     Lib\Display::addKey('CANONICAL_PATH', '/' . $bracket->perma . '/vote');
                     Lib\Display::addKey('title', $bracket->name . ' - Voting' . DEFAULT_TITLE_SUFFIX);
-                    Lib\Display::addKey('bracketNav', $bracket);
+                    self::_setBracketNavTabs($bracket);
                     Lib\Display::renderAndAddKey('content', 'voting', $out);
                 }
             }

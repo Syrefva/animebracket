@@ -17,7 +17,7 @@ namespace Controller {
         $entrantStats = Api\Stats::getEntrantPerformanceStats($bracket);
         Lib\Display::addKey('page', 'stats');
         Lib\Display::addKey('title', 'Stats for ' . $bracket->name . DEFAULT_TITLE_SUFFIX);
-        Lib\Display::addKey('bracketNav', $bracket);
+        self::_setBracketNavTabs($bracket);
         Lib\Display::addKey('CANONICAL_PATH', '/' . $bracket->perma . '/stats');
         Lib\Display::renderAndAddKey('content', 'stats', [
           'entrants' => $entrantStats,

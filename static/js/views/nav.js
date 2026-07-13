@@ -44,27 +44,6 @@ export default Singleton('nav', {
     );
   },
 
-  _labelBracketToggle() {
-    if (!this._$bracketToggle.length) {
-      return;
-    }
-
-    const path = window.location.pathname.replace(/\/$/, '') || '/';
-    let label = 'Pages';
-
-    this._$bracketNav.find('.bracket-nav__link').each((_, link) => {
-      const href = (link.getAttribute('href') || '').replace(/\/$/, '') || '/';
-      if (href === path) {
-        link.classList.add('is-active');
-        label = link.textContent.trim() || label;
-      } else {
-        link.classList.remove('is-active');
-      }
-    });
-
-    this._$bracketToggle.text(label);
-  },
-
   syncStickyOffsets() {
     const header = document.getElementById('nav-header');
     const bracketNav = document.querySelector('.bracket-nav');
@@ -84,7 +63,6 @@ export default Singleton('nav', {
     this._$bracketToggle = this._$bracketNav.find('.bracket-nav__toggle');
     $('body').on(CLICK, this.bodyClick.bind(this));
 
-    this._labelBracketToggle();
     this._syncBracketToggleExpanded();
     this.syncStickyOffsets();
 

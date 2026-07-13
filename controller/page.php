@@ -35,7 +35,6 @@ namespace Controller {
 
             // Kick off page specific rendering
             static::generate($params);
-
         }
 
         /**
@@ -118,6 +117,55 @@ namespace Controller {
 
                 return $retVal;
             });
+
+        }
+
+        /**
+         * Builds contest tab view data for the layout. Call after setting `page`.
+         */
+        protected static function _setBracketNavTabs(Api\Bracket $bracket) {
+            $linksByState = [
+                BS_NOMINATIONS => [
+                    [ 'label' => 'Nominate', 'path' => 'nominate' ],
+                    [ 'label' => 'Entrants', 'path' => 'characters' ],
+                ],
+                BS_ELIMINATIONS => [
+                    [ 'label' => 'Vote', 'path' => 'vote' ],
+                    [ 'label' => 'Entrants', 'path' => 'characters' ],
+                ],
+                BS_VOTING => [
+                    [ 'label' => 'Vote', 'path' => 'vote' ],
+                    [ 'label' => 'Entrants', 'path' => 'characters' ],
+                    [ 'label' => 'Bracket Results', 'path' => 'results' ],
+                    [ 'label' => 'Entrant Stats', 'path' => 'stats' ],
+                ],
+                BS_FINAL => [
+                    [ 'label' => 'Entrants', 'path' => 'characters' ],
+                    [ 'label' => 'Bracket Results', 'path' => 'results' ],
+                    [ 'label' => 'Entrant Stats', 'path' => 'stats' ],
+                ],
+            ];
+            $currentPage = Lib\Display::getKey('page');
+            $items = [];
+            $label = 'Pages';
+
+            $links = isset($linksByState[$bracket->state]) ? $linksByState[$bracket->state] : [];
+            foreach ($links as $link) {
+                $active = $link['path'] === $currentPage;
+                if ($active) {
+                    $label = $link['label'];
+                }
+                $items[] = (object) [
+                    'label' => $link['label'],
+                    'href' => '/' . $bracket->perma . '/' . $link['path'],
+                    'active' => $active,
+                ];
+            }
+
+            Lib\Display::addKey('bracketNavTabs', (object) [
+                'label' => $label,
+                'items' => $items,
+            ]);
         }
 
         protected static function _bracketStateIs($template, $context, $args, $state) {

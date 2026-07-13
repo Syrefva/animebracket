@@ -11,7 +11,7 @@ namespace Controller {
       if ($bracket) {
         Lib\Display::addKey('page', 'nominate');
         Lib\Display::addKey('title', $bracket->name . DEFAULT_TITLE_SUFFIX);
-        Lib\Display::addKey('bracketNav', $bracket);
+        self::_setBracketNavTabs($bracket);
         Lib\Display::addKey('CANONICAL_PATH', '/' . $bracket->perma);
         $content = Lib\Display::renderAndAddKey('content', 'bracket', (object) [
             'bracket' => $bracket,
