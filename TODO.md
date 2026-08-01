@@ -1,0 +1,11 @@
+# TODO list
+- vote changing (in PR)
+- fix mobile site nav (in PR)
+- more smaller screen UI improvements
+  - briefly look at current brackets/past brackets
+  - entrant stats
+  - do we care about about page on tablet size?
+  - do we care about site nav positioning being a bit weird on tablet size? (close to ANIMEBRACKET but far from border below)
+- source on hover
+- ???
+- entrant soft deletes (investigated at one point and seemed annoying to deal with but...)
