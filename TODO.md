@@ -7,5 +7,7 @@
   - do we care about about page on tablet size?
   - do we care about site nav positioning being a bit weird on tablet size? (close to ANIMEBRACKET but far from border below)
 - source on hover
+- see if we can optimize vote stats download
+- support for making OP/ED contest easier to process
 - ???
 - entrant soft deletes (investigated at one point and seemed annoying to deal with but...)
