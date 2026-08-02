@@ -11,3 +11,4 @@
 - support for making OP/ED contest easier to process
 - ???
 - entrant soft deletes (investigated at one point and seemed annoying to deal with but...)
+- tie determination.. (would need to update madness too feelsbad)
